@@ -1,10 +1,12 @@
-(unless (package-installed-p 'mew)
-  (package-refresh-contents) (package-install 'mew))
+(add-to-list 'load-path "~/.emacs.d/mypkg/Mew")
+;; run configure and make in Mew/bin
 
 ;; mew
-(autoload 'mew "mew" nil t)
+(require 'mew)
 (autoload 'mew-send "mew" nil t)
 (setq mew-use-suffix t)
+
+(setq exec-path (cons "~/.emacs.d/mypkg/Mew/bin" exec-path))
 
 ;; Optional setup (Read Mail menu):
 (setq read-mail-command 'mew)

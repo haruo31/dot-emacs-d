@@ -1,3 +1,6 @@
 [submodule "mypkg/howm"]
 	path = mypkg/howm
 	url = https://github.com/jwiegley/howm.git
+[submodule "mypkg/Mew"]
+	path = mypkg/Mew
+	url = https://github.com/kazu-yamamoto/Mew.git
