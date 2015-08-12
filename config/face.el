@@ -68,8 +68,8 @@
 
 (add-to-list 'default-frame-alist '(height . 32))
 (add-to-list 'default-frame-alist '(width . 80))
-(set-face-background hl-line-face "gray14")
 
+;;; see: http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
 (require 'hl-line)
 (defun global-hl-line-timer-function ()
   (global-hl-line-unhighlight-all)
@@ -77,5 +77,8 @@
     (global-hl-line-highlight)))
 (setq global-hl-line-timer
       (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
+
+(set-face-background hl-line-face "gray14")
+
 
 ;;;
