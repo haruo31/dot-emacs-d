@@ -1,0 +1,3 @@
+[submodule "mypkg/howm"]
+	path = mypkg/howm
+	url = https://github.com/jwiegley/howm.git

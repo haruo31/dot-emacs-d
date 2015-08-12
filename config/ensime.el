@@ -1,3 +1,6 @@
+(unless (package-installed-p 'ensime)
+  (package-refresh-contents) (package-install 'ensime))
+
 ;; ensime
 (require 'ensime)
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
