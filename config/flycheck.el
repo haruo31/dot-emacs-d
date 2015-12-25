@@ -10,7 +10,8 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'python-mode-hook #'flycheck-mode)
 ;; epylint へパスが通っていないとシンタックスチェックが働かない
-;; (setq exec-path (cons "/usr/local/bin" exec-path))
+(if (eq system-type 'darwin)
+    (setq exec-path (cons "/usr/local/bin" exec-path)))
 
 (eval-after-load 'flycheck
   '(custom-set-variables

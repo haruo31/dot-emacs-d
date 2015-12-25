@@ -5,4 +5,4 @@
 
 (add-to-list 'load-path "~/.emacs.d/mypkg/visual-basic-mode")
 ;; howm
-(require 'visual-basic-mode)
+;; (require 'visual-basic-mode)
