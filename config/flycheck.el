@@ -13,6 +13,5 @@
 (if (eq system-type 'darwin)
     (setq exec-path (cons "/usr/local/bin" exec-path)))
 
-(eval-after-load 'flycheck
-  '(custom-set-variables
-   '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+(with-eval-after-load 'flycheck
+  (flycheck-pos-tip-mode))
