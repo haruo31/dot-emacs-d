@@ -13,5 +13,6 @@
 (if (eq system-type 'darwin)
     (setq exec-path (cons "/usr/local/bin" exec-path)))
 
-(with-eval-after-load 'flycheck
-  (flycheck-pos-tip-mode))
+(when window-system
+  (with-eval-after-load 'flycheck
+    (flycheck-pos-tip-mode)))

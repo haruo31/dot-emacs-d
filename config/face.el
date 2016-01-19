@@ -61,24 +61,22 @@
      ;; Windows, gnupack
      ;; gnupack の ini で設定されているのをそのまま使う。
      ))
-  (progn
-    (set-face-attribute 'default nil :family "M+ 2m" :height 100 :weight 'semi-bold)
-    (set-fontset-font nil 'japanese-jisx0208 (font-spec :name "M+ 2m")))
+  (when window-system
+    (progn
+      (set-face-attribute 'default nil :family "M+ 2m" :height 100 :weight 'semi-bold)
+      (set-fontset-font nil 'japanese-jisx0208 (font-spec :name "M+ 2m"))
+      ;;; see: http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
+      (require 'hl-line)
+      (defun global-hl-line-timer-function ()
+        (global-hl-line-unhighlight-all)
+        (let ((global-hl-line-mode t))
+          (global-hl-line-highlight)))
+      (setq global-hl-line-timer
+            (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
+      (set-face-background hl-line-face "gray14")))
   )
 
 (add-to-list 'default-frame-alist '(height . 32))
 (add-to-list 'default-frame-alist '(width . 80))
-
-;;; see: http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
-(require 'hl-line)
-(defun global-hl-line-timer-function ()
-  (global-hl-line-unhighlight-all)
-  (let ((global-hl-line-mode t))
-    (global-hl-line-highlight)))
-(setq global-hl-line-timer
-      (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
-
-(set-face-background hl-line-face "gray14")
-
 
 ;;;
