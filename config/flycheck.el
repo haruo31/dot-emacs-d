@@ -1,8 +1,8 @@
 (unless (package-installed-p 'flycheck)
   (package-refresh-contents) (package-install 'flycheck))
 
-(unless (package-installed-p 'flycheck-pyflakes)
-  (package-refresh-contents) (package-install 'flycheck-pyflakes))
+;;(unless (package-installed-p 'flycheck-pyflakes)
+;;  (package-refresh-contents) (package-install 'flycheck-pyflakes))
 (unless (package-installed-p 'flycheck-pos-tip)
   (package-refresh-contents) (package-install 'flycheck-pos-tip))
 
@@ -13,6 +13,7 @@
 (if (eq system-type 'darwin)
     (setq exec-path (cons "/usr/local/bin" exec-path)))
 
-(when window-system
-  (with-eval-after-load 'flycheck
-    (flycheck-pos-tip-mode)))
+(eval-after-load "flycheck-mode"
+  '(when window-system
+     (with-eval-after-load 'flycheck
+       (flycheck-pos-tip-mode))))

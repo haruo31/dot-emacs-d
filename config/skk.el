@@ -2,8 +2,11 @@
   (package-refresh-contents) (package-install 'ddskk))
 
 (autoload 'skk-mode "skk" nil t)
-(global-set-key "\C-x\C-j" 'skk-mode)
-(global-set-key "\C-xj" 'skk-auto-fill-mode)
 
-(if (file-exists-p "~/.emacs.d/SKK-JISYO.L")
-    (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L"))
+(add-hook
+ 'after-init-hook
+ '(lambda ()
+    (progn
+      (setq default-input-method "japanese-skk")
+      (if (file-exists-p "~/.emacs.d/SKK-JISYO.L")
+        (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")))))
