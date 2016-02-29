@@ -31,10 +31,10 @@
 ;; (setq create-lockfiles nil)
 
 (require 'package)
+(setq package-enable-at-startup nil)
 (add-to-list 'package-archives
   '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
-
 
 (defun load-directory (directory)
   "Load recursively all `.el' files in DIRECTORY."
