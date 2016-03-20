@@ -1,6 +1,6 @@
 
 (unless (package-installed-p 'wanderlust)
-  (package-refresh-contents) (package-install 'wanderlast))
+  (package-refresh-contents) (package-install 'wanderlust))
 
 ;; autoload configuration
 ;; (Not required if you have installed Wanderlust as XEmacs package)
