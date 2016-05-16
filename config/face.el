@@ -65,8 +65,8 @@
            ))
       (when window-system
         (progn
-          (set-face-attribute 'default nil :family "M+ 2m" :height 100 :weight 'semi-bold)
-          (set-fontset-font nil 'japanese-jisx0208 (font-spec :name "M+ 2m"))
+          (set-face-attribute 'default nil :family "M+ 1m" :height 100 :weight 'semi-bold)
+          (set-fontset-font nil 'japanese-jisx0208 (font-spec :name "M+ 1m"))
       ;;; see: http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
           (require 'hl-line)
           (defun global-hl-line-timer-function ()
