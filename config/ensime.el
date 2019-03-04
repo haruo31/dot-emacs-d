@@ -2,6 +2,7 @@
   (package-refresh-contents) (package-install 'ensime))
 
 ;; ensime
+;; https://www.ncaq.net/2018/05/18/16/15/50/
 (eval-after-load "ensime"
   '(progn
      (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
