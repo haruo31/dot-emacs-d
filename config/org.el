@@ -1,8 +1,6 @@
-(unless (package-installed-p 'org)
-  (package-refresh-contents) (package-install 'org))
+(check-and-install-package 'org 'ob-rust)
 
 (require 'org)
-(require 'org-tempo)
 (add-hook 'org-mode-hook 'howm-mode)
 (setq howm-file-name-format "%Y/%m/%Y_%m_%d.howm")
 (add-to-list 'auto-mode-alist '("\\.howm$" . org-mode))

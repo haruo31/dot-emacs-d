@@ -1,10 +1,4 @@
-(unless (package-installed-p 'flycheck)
-  (package-refresh-contents) (package-install 'flycheck))
-
-(unless (package-installed-p 'flycheck-pos-tip)
-  (package-refresh-contents) (package-install 'flycheck-pos-tip))
-(unless (package-installed-p 'flycheck-rust)
-  (package-refresh-contents) (package-install 'flycheck-rust))
+(check-and-install-package 'flycheck 'flycheck-rust 'flycheck-pos-tip)
 
 ;; flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)

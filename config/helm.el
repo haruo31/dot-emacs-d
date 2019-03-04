@@ -1,7 +1,4 @@
-(unless (package-installed-p 'helm)
-  (package-refresh-contents) (package-install 'helm))
-(unless (package-installed-p 'helm-gtags)
-  (package-refresh-contents) (package-install 'helm-gtags))
+(check-and-install-package 'helm 'helm-gtags)
 
 (add-hook
  'after-init-hook

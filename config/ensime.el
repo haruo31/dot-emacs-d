@@ -1,5 +1,4 @@
-(unless (package-installed-p 'ensime)
-  (package-refresh-contents) (package-install 'ensime))
+(check-and-install-package 'ensime)
 
 ;; ensime
 ;; https://www.ncaq.net/2018/05/18/16/15/50/

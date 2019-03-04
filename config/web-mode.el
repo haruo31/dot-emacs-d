@@ -1,5 +1,4 @@
-(unless (package-installed-p 'web-mode)
-  (package-refresh-contents) (package-install 'web-mode))
+(check-and-install-package 'web-mode)
 
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))

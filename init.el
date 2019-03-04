@@ -53,6 +53,15 @@ There are two things you can do about this warning:
     (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
 
+(defun check-and-install-package (&rest packages)
+  (dolist (pkg packages)
+    (unless (package-installed-p pkg)
+      (package-refresh-contents) (package-install pkg))))
+
+;; on update packages
+;; execute: M-x package-list-packages
+;; and type U and x
+
 ;; load config/ directory
 (defun load-directory (directory)
   "Load recursively all `.el' files in DIRECTORY."

@@ -1,5 +1,4 @@
-(unless (package-installed-p 'howm)
-  (package-refresh-contents) (package-install 'howm))
+(check-and-install-package 'howm)
 
 ;; howm
 (setq howm-menu-lang 'ja)

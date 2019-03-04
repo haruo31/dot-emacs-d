@@ -1,7 +1,4 @@
-(unless (package-installed-p 'rust-mode)
-  (package-refresh-contents) (package-install 'rust-mode))
-(unless (package-installed-p 'racer)
-  (package-refresh-contents) (package-install 'racer))
+(check-and-install-package 'rust-mode 'racer)
 
 (add-hook
  'after-init-hook

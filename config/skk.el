@@ -1,5 +1,4 @@
-(unless (package-installed-p 'ddskk)
-  (package-refresh-contents) (package-install 'ddskk))
+(check-and-install-package 'ddskk)
 
 (autoload 'skk-mode "skk" nil t)
 

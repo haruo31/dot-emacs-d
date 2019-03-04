@@ -1,5 +1,4 @@
-(unless (package-installed-p 'tide)
-  (package-refresh-contents) (package-install 'tide))
+(check-and-install-package 'tide)
 
 (require 'tide)
 ;; sample config
