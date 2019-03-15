@@ -1,0 +1,7 @@
+/session.*
+/abbrev_defs
+/ac-comphist.dat
+/ensime
+/anaconda-mode
+/*private.el
+/elpa

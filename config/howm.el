@@ -1,5 +1,5 @@
+(check-and-install-package 'howm)
 
-(add-to-list 'load-path "~/.emacs.d/mypkg/howm")
 ;; howm
 (setq howm-menu-lang 'ja)
 (global-unset-key "\C-z")

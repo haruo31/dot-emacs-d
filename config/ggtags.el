@@ -1,5 +1,7 @@
-(unless (package-installed-p 'ggtags)
-  (package-refresh-contents) (package-install 'ggtags))
+(check-and-install-package 'ggtags)
+
+;;; https://github.com/leoliu/ggtags
+;;; http://blog.10rane.com/2014/09/17/to-reading-comprehension-of-the-source-code-by-introducing-the-helm-gtags-mode/
 
 (add-hook 'c-mode-common-hook
            (lambda ()

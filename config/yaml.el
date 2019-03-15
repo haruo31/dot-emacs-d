@@ -1,6 +1,6 @@
-(unless (package-installed-p 'yaml-mode)
-  (package-refresh-contents) (package-install 'yaml-mode))
+(check-and-install-package 'yaml-mode 'toml)
 
+(require 'toml)
 (require 'yaml-mode)
 (add-hook 'yaml-mode-hook
           (lambda ()

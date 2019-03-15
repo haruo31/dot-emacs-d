@@ -1,11 +1,6 @@
-(unless (package-installed-p 'company)
-  (package-refresh-contents) (package-install 'company))
-(unless (package-installed-p 'company-anaconda)
-  (package-refresh-contents) (package-install 'company-anaconda))
+(check-and-install-package 'company 'company-anaconda)
 
-;; company-mode
-;; (add-hook 'after-init-hook 'global-company-mode)
-
+;; enable anaconda mode
 (eval-after-load "company"
   '(progn
      (global-company-mode 1)

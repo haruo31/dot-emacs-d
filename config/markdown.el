@@ -1,5 +1,4 @@
-(unless (package-installed-p 'markdown-mode)
-  (package-refresh-contents) (package-install 'markdown-mode))
+(check-and-install-package 'markdown-mode)
 
 (add-hook
  'after-init-hook

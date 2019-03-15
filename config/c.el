@@ -1,6 +1,4 @@
-
-
-(check-and-package-install 'ggtags)
+(check-and-install-package 'ggtags)
 
 (require 'ggtags)
 
