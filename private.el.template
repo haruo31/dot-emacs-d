@@ -1,3 +1,13 @@
 
+;;; simple proxy setting
 ;; (setq url-proxy-services '(("http" . "127.0.0.1:8338")))
 ;;
+
+;;; dynamic proxy selector (proxy roaming)
+;; (setq url-proxy-locator
+;;  (lambda (url host)
+;;    (cond
+;;     ((not (dns-query "proxy.example.com")) "DIRECT")
+;;     ((string-match "^localhost\\|^192\\.168\\.\\|\\.local\\(:[0-9]+\\)?$\\|^[^\\.]*$" host) "DIRECT")
+;;     ((string-match "^10\\.[\\.0-9:]+$" host) "SOCKS socksproxy.example.com:9999")
+;;     (t "PROXY proxy.example.com:8000; DIRECT"))))
