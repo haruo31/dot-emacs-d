@@ -1,4 +1,4 @@
-(check-and-install-package 'org 'ob-rust)
+(check-and-install-package 'org 'ob-rust 'htmlize)
 
 (require 'org)
 (add-hook 'org-mode-hook 'howm-mode)
