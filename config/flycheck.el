@@ -1,4 +1,4 @@
-(check-and-install-package 'flycheck 'flycheck-rust 'flycheck-pos-tip)
+(check-and-install-package 'flycheck 'flycheck-rust 'flycheck-pos-tip 'add-node-modules-path)
 
 ;; flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -9,3 +9,8 @@
   '(when window-system
      (with-eval-after-load 'flycheck
        (flycheck-pos-tip-mode))))
+
+(setq css-indent-offset 2)
+
+(eval-after-load 'js-mode
+  '(add-hook 'js-mode-hook #'add-node-modules-path))

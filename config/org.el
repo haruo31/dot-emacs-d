@@ -1,4 +1,4 @@
-(check-and-install-package 'org 'ob-rust 'htmlize)
+(check-and-install-package 'org 'ob-rust 'htmlize 'ansi-color)
 
 (require 'org)
 (add-hook 'org-mode-hook 'howm-mode)
@@ -18,6 +18,7 @@
  '((C . t)
    (R . t)
    (calc . t)
+   (ditaa . t)
    (dot . t)
    (java . t)
    (ledger . t)
@@ -25,3 +26,9 @@
    (rust . t)
    (scala . t)
    (shell . t)))
+
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
