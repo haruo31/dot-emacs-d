@@ -20,6 +20,7 @@
    (calc . t)
    (ditaa . t)
    (dot . t)
+   (perl . t)
    (java . t)
    (ledger . t)
    (python . t)
@@ -32,3 +33,11 @@
   (interactive)
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region (point-min) (point-max))))
+
+(with-eval-after-load "eval-in-repl"
+  (setq eir-jump-after-eval nil))
+
+(with-eval-after-load "ob"
+  (require 'org-babel-eval-in-repl)
+  (define-key org-mode-map (kbd "C-<return>") 'ober-eval-in-repl)
+  (define-key org-mode-map (kbd "M-<return>") 'ober-eval-block-in-repl))
