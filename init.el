@@ -1,31 +1,22 @@
 
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(current-language-environment "UTF-8")
- '(custom-enabled-themes (quote (wheatgrass)))
- '(package-selected-packages
-   (quote
-    (toml racer rust-mode ob-rust mu4e-maildirs-extension org-mu4e howm helm-flycheck helm-git helm-git-files helm-git-grep helm-ls-git helm-mu helm-pydoc groovy-mode wanderlust yaml-mode web-mode vbasense tide semi php-mode mmm-mode markdown-mode helm-gtags ggtags flycheck-pos-tip ensime ddskk company-anaconda)))
- '(safe-local-variable-values
-   (quote
-    ((eval setq flycheck-clang-include-path
-           (list "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include/linux"))
-     (flycheck-clang-include-path "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include")
-     (company-clang-arguments "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include"))))
- '(tool-bar-mode nil))
+(load custom-file t)
+(load "~/.emacs.d/private.el" t)
 
-;; utility functions
+(require 'package)
+(package-initialize)
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")))
 
-(defun load-if-exists (el)
-  (if (file-exists-p el) (load el)))
+(unless (require 'use-package nil t)
+  (progn (package-refresh-contents)
+         (package-install 'use-package)
+         (require 'use-package)))
 
-
+;;;;;; key configuration
 
 ;; tab
 (setq-default tab-width 4)
@@ -33,64 +24,211 @@
 (electric-indent-mode 0)
 
 (setq make-backup-files nil
-      auto-save-default nil)
+      viper-mode nil
+      auto-save-default t)
 
-;; parenthesis
-;; http://emacs.rubikitch.com/show-paren-local-mode/
-(show-paren-mode t)
+;;;;;; input method
 
-;; delete whitespace before save
-(add-hook 'before-save-hook
-          'delete-trailing-whitespace)
+(use-package skk
+  :ensure ddskk
+  :config
+  (setq default-input-method "japanese-skk")
+  (setq skk-preload t)
+  (if (file-exists-p "~/.emacs.d/SKK-JISYO.L")
+      (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")))
 
+;;;;;; journal
 
-(load-if-exists "~/.emacs.d/private.el")
+(use-package org
+  :ensure t
+  :config
+  (setq org-return-follows-link t
+        org-src-fontify-natively t
+        org-confirm-babel-evaluate nil))
 
-;; package manager
-;; enabling MELPA
-;; https://www-he.scphys.kyoto-u.ac.jp/member/shotakaha/dokuwiki/doku.php?id=toolbox:emacs:package:start
-(require 'package)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-Your version of Emacs does not support SSL connections,
-which is unsafe because it allows man-in-the-middle attacks.
-There are two things you can do about this warning:
-1. Install an Emacs version that does support SSL and be safe.
-2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
-(package-initialize)
+(use-package org-journal
+  :ensure t
+  :after org
+  :custom
+  (org-journal-dir "~/howm/")
+  (org-journal-file-format "%Y/%m/%Y%m%d.howm")
+  (org-journal-date-format "%Y-%m-%d")
+  :config
+  (setq org-journal-enable-agenda-integration t
+        org-icalendar-store-UID t
+        org-icalendar-include-todo "all"
+        org-icalendar-combined-agenda-file "~/howm/org-journal.ics"
+        org-agenda-file-regexp "\\`\\\([^.].*\\.\\\(org\\\|howm\\\)\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
+  (add-to-list 'org-agenda-files org-journal-dir))
 
-(defun check-and-install-package (&rest packages)
-  (dolist (pkg packages)
-    (unless (package-installed-p pkg)
-      (package-refresh-contents) (package-install pkg))))
+;;;;;; pinentry
 
-;; on update packages
-;; execute: M-x package-list-packages
-;; and type U and x
+(use-package pinentry
+  :ensure t
+  :config
+  (pinentry-start))
 
-;; load config/ directory
-(defun load-directory (directory)
-  "Load recursively all `.el' files in DIRECTORY."
-  (dolist (element (directory-files-and-attributes directory nil nil nil))
-    (let* ((path (car element))
-           (fullpath (concat directory "/" path))
-           (isdir (car (cdr element)))
-           (ignore-dir (or (string= path ".") (string= path ".."))))
-      (cond
-       ((and (eq isdir t) (not ignore-dir))
-        (load-directory fullpath))
-       ((and (eq isdir nil) (string= (substring path -3) ".el"))
-        (load (file-name-sans-extension fullpath)))))))
+;;;;;; helm
 
-(load-directory "~/.emacs.d/config")
+(use-package helm-config
+  :ensure helm
+  :bind
+  (("M-x" . helm-M-x)
+   ("C-x C-f" . helm-find-files)
+   ("C-x b" . helm-buffers-list))
+  :config
+  (helm-mode 1))
 
-(load-if-exists "~/.emacs.d/mu4e.private.el")
+;;;;;; email
+
+(load "~/.emacs.d/mu4e.private.el" t)
+
+(use-package bbdb
+  :ensure t
+  :config
+  (bbdb-initialize 'message))
+
+;;;;;; look and feels
+
+(add-hook
+ 'after-init-hook
+ '(lambda ()
+    (progn
+      (custom-set-variables
+       '(max-mini-window-height 3)
+       '(tool-bar-mode nil)
+       '(current-language-environment "UTF-8")
+       '(show-paren-mode t))
+      (if (eq system-type 'darwin)
+          (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+        (when window-system
+          (custom-set-faces
+           ;; custom-set-faces was added by Custom.
+           ;; If you edit it by hand, you could mess it up, so be careful.
+           ;; Your init file should contain only one such instance.
+           ;; If there is more than one, they won't work right.
+           '(default
+              ((t (:inherit nil
+                            :stipple nil
+                            :background "black"
+                            :foreground "wheat"
+                            :inverse-video nil
+                            :box nil
+                            :strike-through nil
+                            :overline nil
+                            :underline nil
+                            :slant normal
+                            :weight normal
+                            :height 105
+                            :width normal
+                            :foundry "PfEd"
+                            :family "Noto Sans Mono"))))))))))
+
+(use-package doom-themes
+  :ensure t
+  :config
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  (load-theme 'doom-dracula t))
+
+(use-package all-the-icons
+  :ensure t)
+
+(use-package doom-modeline
+  :ensure t
+  :after all-the-icons
+  :config
+  (doom-modeline-mode 1)
+  (display-time-mode 1))
+
+;;;;;; development
+
+(use-package diff-hl
+  :ensure t
+  :config
+  (global-diff-hl-mode 1))
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
+(use-package projectile
+  :ensure t
+  :bind
+  (:map projectile-mode-map
+        ("C-c p" . projectile-command-map))
+  :config
+  (projectile-mode 1))
+
+(use-package flymake
+  :ensure t
+  :bind
+  (:map flymake-mode-map
+        (("M-n" . flymake-goto-next-error)
+         ("M-p" . flymake-goto-prev-error)))
+  :hook
+  (elisp-mode . flymake-mode)
+  :config
+  (setq flymake-no-changes-timeout 0.2))
+
+(use-package helm-flymake
+  :after (helm flymake)
+  :custom
+  (flymake-cursor-error-display-delay 0.4)
+  (flymake-cursor-number-of-errors-to-display 3)
+  :config
+  (flymake-cursor-mode))
+
+(use-package company
+  :ensure t
+  :hook
+  (after-init . global-company-mode)
+  :bind
+  (("M-/" . company-complete))
+  :config
+  (lambda () t))
+
+;;;;;; jedi python mode
+
+(use-package jedi-core
+  :ensure company-jedi
+  :after company
+  :hook
+  (python-mode . jedi:setup)
+  :config
+  (setq jedi:complete-on-dot t)
+  (setq jedi:use-shortcuts t)
+  (add-to-list 'company-backends 'company-jedi))
+
+;;;;;; c family cpp objc
+
+(use-package irony
+  :ensure t
+  :hook
+  ((c-mode irony-mode)
+   (c++-mode irony-mode)
+   (objc-mode irony-mode)
+   (irony-mode irony-cdb-autosetup-compile-options))
+  :config
+  (setq irony-lang-compile-option-alist
+        '((c++-mode . ("c++" "-std=c++11" "-lstdc++" "-lm"))
+          (c-mode . ("c"))
+          (objc-mode . '("objective-c"))))
+  (defun irony--lang-compile-option ()
+    (irony--awhen (cdr-safe (assq major-mode irony-lang-compile-option-alist))
+      (append '("-x") it))))
+
+(use-package company-irony
+  :ensure t
+  :after (company irony)
+  :config
+  (add-to-list 'company-backends 'company-irony))
+
+;;;;;; nxml html modes
+
+(use-package nxml-mode)
+
+;;;; delete whitespace before save
+;;(add-hook 'before-save-hook
+;;          'delete-trailing-whitespace)
