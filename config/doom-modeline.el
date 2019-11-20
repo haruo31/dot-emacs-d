@@ -7,7 +7,6 @@
       doom-themes-enable-italic t)
 (load-theme 'doom-dracula t)
 
-(require 'all-the-icons)
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 (display-time-mode 1)
