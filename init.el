@@ -1,4 +1,21 @@
 
+;;;;;; path for command executable
+;;;;;; see: http://sakito.jp/emacs/emacsshell.html#path
+(dolist
+    (dir (list
+          "/sbin"
+          "/usr/sbin"
+          "/bin"
+          "/usr/bin"
+          "/opt/local/bin"
+          "/sw/bin"
+          "/usr/local/bin"
+          (expand-file-name "~/bin")
+          (expand-file-name "~/.emacs.d/bin")))
+  (when (and (file-exists-p dir) (not (member dir exec-path)))
+    (setenv "PATH" (concat dir ":" (getenv "PATH")))
+    (setq exec-path (append (list dir) exec-path))))
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (load custom-file t)
@@ -161,24 +178,13 @@
   :config
   (projectile-mode 1))
 
-(use-package flymake
+(use-package flycheck
   :ensure t
-  :bind
-  (:map flymake-mode-map
-        (("M-n" . flymake-goto-next-error)
-         ("M-p" . flymake-goto-prev-error)))
-  :hook
-  (elisp-mode . flymake-mode)
-  :config
-  (setq flymake-no-changes-timeout 0.2))
+  :init (global-flycheck-mode)
+)
 
-(use-package helm-flymake
-  :after (helm flymake)
-  :custom
-  (flymake-cursor-error-display-delay 0.4)
-  (flymake-cursor-number-of-errors-to-display 3)
-  :config
-  (flymake-cursor-mode))
+(use-package lsp-mode
+  :commands lsp)
 
 (use-package company
   :ensure t
@@ -189,45 +195,33 @@
   :config
   (lambda () t))
 
-;;;;;; jedi python mode
+(use-package lsp-ui
+  :commands lsp-ui-mode)
+(use-package company-lsp
+  :commands company-lsp)
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol)
 
-(use-package jedi-core
-  :ensure company-jedi
-  :after company
-  :hook
-  (python-mode . jedi:setup)
-  :config
-  (setq jedi:complete-on-dot t)
-  (setq jedi:use-shortcuts t)
-  (add-to-list 'company-backends 'company-jedi))
+;;;;;; python mode
+;;;;;; lsp does it
+
+(use-package conda
+  :ensure t)
+
+(conda-env-autoactivate-mode
 
 ;;;;;; c family cpp objc
 
-(use-package irony
+(use-package cquery
   :ensure t
-  :hook
-  ((c-mode irony-mode)
-   (c++-mode irony-mode)
-   (objc-mode irony-mode)
-   (irony-mode irony-cdb-autosetup-compile-options))
+  :after lsp-mode
+  :if (executable-find "cquery")
   :config
-  (setq irony-lang-compile-option-alist
-        '((c++-mode . ("c++" "-std=c++11" "-lstdc++" "-lm"))
-          (c-mode . ("c"))
-          (objc-mode . '("objective-c"))))
-  (defun irony--lang-compile-option ()
-    (irony--awhen (cdr-safe (assq major-mode irony-lang-compile-option-alist))
-      (append '("-x") it))))
-
-(use-package company-irony
-  :ensure t
-  :after (company irony)
-  :config
-  (add-to-list 'company-backends 'company-irony))
+  (setq cquery-executable (executable-find "cquery")))
 
 ;;;;;; nxml html modes
 
-(use-package nxml-mode)
+
 
 ;;;; delete whitespace before save
 ;;(add-hook 'before-save-hook
