@@ -1,4 +1,3 @@
-
 ;;;;;; path for command executable
 ;;;;;; see: http://sakito.jp/emacs/emacsshell.html#path
 (dolist
@@ -21,12 +20,21 @@
 (load custom-file t)
 (load "~/.emacs.d/private.el" t)
 
+(turn-off-auto-fill)
+(remove-hook 'text-mode-hook #'auto-fill-mode)
+(remove-hook 'org-mode-hook #'auto-fill-mode)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+(add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+(add-hook 'org-capture 'turn-on-visual-line-mode)
+;; auto revert mode
+(global-auto-revert-mode 1)
+
 (require 'package)
 (package-initialize)
 (setq package-archives
-      '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")))
 
 (unless (require 'use-package nil t)
   (progn (package-refresh-contents)
@@ -44,15 +52,34 @@
       viper-mode nil
       auto-save-default t)
 
+;;;;;; quelpa-use-package
+(use-package auto-package-update
+  :ensure t
+  :config
+  (setq auto-package-update-delete-old-versions t
+        auto-package-update-interval 4)
+  (auto-package-update-maybe))
+
 ;;;;;; input method
 
 (use-package skk
   :ensure ddskk
   :config
-  (setq default-input-method "japanese-skk")
   (setq skk-preload t)
   (if (file-exists-p "~/.emacs.d/SKK-JISYO.L")
-      (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")))
+      (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L"))
+  (add-hook
+   'set-language-environment-hook
+   '(lambda ()
+      (if (equal current-language-environment "Japanese")
+          (progn
+            (set-terminal-coding-system 'utf-8)
+            (set-keyboard-coding-system 'utf-8)
+            (set-buffer-file-coding-system 'utf-8)
+            (setq default-buffer-file-coding-system 'utf-8)
+            (setq file-name-coding-system 'utf-8)
+            (set-default-coding-systems 'utf-8)
+            (setq default-input-method "japanese-skk"))))))
 
 ;;;;;; journal
 
@@ -61,7 +88,14 @@
   :config
   (setq org-return-follows-link t
         org-src-fontify-natively t
-        org-confirm-babel-evaluate nil))
+        org-confirm-babel-evaluate nil)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (shell . t)
+     (python . t)
+     (perl . t)
+     )))
 
 (use-package org-journal
   :ensure t
@@ -94,6 +128,8 @@
    ("C-x C-f" . helm-find-files)
    ("C-x b" . helm-buffers-list))
   :config
+  (setq helm-semantic-fuzzy-match t
+        helm-imenu-fuzzy-match    t)
   (helm-mode 1))
 
 ;;;;;; email
@@ -114,7 +150,6 @@
       (custom-set-variables
        '(max-mini-window-height 3)
        '(tool-bar-mode nil)
-       '(current-language-environment "UTF-8")
        '(show-paren-mode t))
       (if (eq system-type 'darwin)
           (set-fontset-font t 'unicode "Symbola" nil 'prepend)
@@ -172,19 +207,24 @@
 
 (use-package projectile
   :ensure t
+  :init
+  (setq projectile-file-exists-remote-cache-expire nil
+        projectile-mode-line '(:eval (format " Projectile[%s]" (projectile-project-name)))
+        projectile-globally-ignored-directories
+        (quote
+         (".idea" ".eunit" ".git" ".hg" ".svn" ".fslckout" ".bzr" "_darcs" ".tox" "build" "target")))
   :bind
   (:map projectile-mode-map
         ("C-c p" . projectile-command-map))
   :config
   (projectile-mode 1))
 
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode)
-)
-
 (use-package lsp-mode
-  :commands lsp)
+  :ensure t
+  :hook (XXX-mode . lsp)
+  :commands lsp
+  :config
+  (setq lsp-log-io t))
 
 (use-package company
   :ensure t
@@ -196,19 +236,29 @@
   (lambda () t))
 
 (use-package lsp-ui
-  :commands lsp-ui-mode)
+  :ensure t
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-mode t))
+
 (use-package company-lsp
-  :commands company-lsp)
+  :ensure t
+  :commands company-lsp
+  :config
+  (push 'company-lsp company-backends))
+
 (use-package helm-lsp
+  :ensure t
   :commands helm-lsp-workspace-symbol)
 
 ;;;;;; python mode
 ;;;;;; lsp does it
 
-(use-package conda
-  :ensure t)
-
-(conda-env-autoactivate-mode
+(lsp-register-client
+  (make-lsp-client :new-connection (lsp-tramp-connection "/home01/haruo31/.local/bin/pyls")
+                   :major-modes '(python-mode)
+                   :remote? t
+                   :server-id 'pyls-remote))
 
 ;;;;;; c family cpp objc
 
@@ -221,8 +271,34 @@
 
 ;;;;;; nxml html modes
 
+;;;;;; tramp mode
 
+(use-package tramp)
+
+;(lsp-register-client
+; (make-lsp-client :new-connection (lsp-stdio-connection
+;                                   (lambda () lsp-clients-python-command))
+;                  :major-modes '(python-mode cython-mode)
+;                  :priority -1
+;                  :server-id 'pyls
+;                  :remote? (lambda () lsp-is-remote)
+;                  :library-folders-fn (lambda (_workspace) lsp-clients-python-library-directories)
+;                  :initialized-fn (lambda (workspace)
+;                                    (with-lsp-workspace workspace
+;                                      (lsp--set-configuration (lsp-configuration-section "pyls"))))))
+;
+
+;;;;;; yaml mode
+
+(use-package yaml-mode
+  :ensure t)
 
 ;;;; delete whitespace before save
 ;;(add-hook 'before-save-hook
 ;;          'delete-trailing-whitespace)
+
+
+;;;;;; groovy mode
+
+(use-package groovy-mode
+  :ensure t)
